@@ -1,3 +1,6 @@
+/**
+  Provided case classes
+ */
 case class Rate(rateCode: String, rateGroup: String)
 
 case class CabinPrice(cabinCode: String, rateCode: String, price: BigDecimal)
@@ -11,6 +14,12 @@ case class BestGroupPrice(
 case class Promotion(code: String, notCombinableWith: Seq[String])
 case class PromotionCombo(promotionCodes: Seq[String])
 
+/**
+  Promotion Combination solution (Problem 2)
+
+  Invert the given {code}notCombinableWith{/code} relations as combinable and build a map.
+  Then, find the maximum cliques in the graph conferred by this map.
+ */
 class PromoCombos(promos: Seq[Promotion]) {
 
   val promosByCode: Map[String, Promotion] = promos.map(promo => (promo.code -> promo)).toMap
@@ -34,11 +43,15 @@ class PromoCombos(promos: Seq[Promotion]) {
 
   def getAllPromoCombos: Seq[PromotionCombo] = allPromoCombos
   
-  def getPromoCombos(promo: String): Seq[PromotionCombo] = allPromoCombos.collect{
-    case PromotionCombo(codes) if codes.contains(promo) => PromotionCombo(codes)
+  def getPromoCombos(promo: String): Seq[PromotionCombo] = allPromoCombos.filter { combo =>
+    combo.promotionCodes contains promo
   }
 }
 
+/**
+  Group cabin price solution (Problem 1), promotion combination method prototypes as given,
+  and all test cases, executable as "main".
+ */
 object Solution {
 
   def getBestGroupPrices(rates: Seq[Rate], prices: Seq[CabinPrice]): Seq[BestGroupPrice] = {
@@ -62,6 +75,14 @@ object Solution {
         }
     }.toSeq
   }
+
+  def allCombinablePromotions(allPromotions: Seq[Promotion]): Seq[PromotionCombo] =
+    PromoCombos(allPromotions).getAllPromoCombos
+    
+  def combinablePromotions(
+    promotionCode: String,
+    allPromotions: Seq[Promotion]
+  ): Seq[PromotionCombo] = PromoCombos(allPromotions).getPromoCombos(promotionCode)
 
   def groupPriceTestCaseGiven: Unit = {
     val rates = Seq(
